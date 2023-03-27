@@ -2,6 +2,12 @@ data "aws_caller_identity" "current" {
   provider = aws.primary
 }
 
+variable "aws_account_id" {
+  description = "The AWS Account ID"
+  type        = string
+  nullable    = false
+}
+
 provider "aws" {
   alias  = "primary"
   region = "us-east-1"
