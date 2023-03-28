@@ -1,5 +1,9 @@
 # terraform-module-cloud-aws-dnssec-kms-key
 <!-- BEGIN_TF_DOCS -->
+# terraform-module-cloud-aws-management-tenant-dns
+
+This Terraform module creates an AWS KMS key and Replica to be used by Route53 DNSSEC.
+
 ## Requirements
 
 No requirements.
