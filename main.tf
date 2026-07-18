@@ -1,19 +1,25 @@
+terraform {
+  required_providers {
+    aws = {
+      source                = "hashicorp/aws"
+      configuration_aliases = [aws.primary]
+    }
+  }
+}
+
 data "aws_caller_identity" "current" {
   provider = aws.primary
 }
 
-variable "aws_account_id" {
-  description = "The AWS Account ID"
-  type        = string
-  nullable    = false
+data "aws_region" "primary" {
+  provider = aws.primary
 }
 
-provider "aws" {
-  alias  = "primary"
-  region = "us-east-1"
-  assume_role {
-    role_arn = "arn:aws:iam::${var.aws_account_id}:role/OrganizationAccountAccessRole"
-  }
+variable "aws_account_id" {
+  description = "DEPRECATED: no longer used. The aws.primary provider configuration is supplied by the caller now; this variable remains only so existing callers keep working."
+  type        = string
+  nullable    = true
+  default     = null
 }
 
 resource "aws_kms_key" "primary" {
@@ -51,6 +57,13 @@ resource "aws_kms_key" "primary" {
     ]
     Version = "2012-10-17"
   })
+
+  lifecycle {
+    precondition {
+      condition     = data.aws_region.primary.name == "us-east-1"
+      error_message = "Route53 DNSSEC requires its KMS key in us-east-1. Pass an aws.primary provider configured for us-east-1."
+    }
+  }
 }
 
 output "kms_key_arn" {
